@@ -8,7 +8,7 @@ from move import Move
 random.seed()
 
 class Pokemon:
-    def __init__(self, name:str, types:str, moves:str, EVs:dict, xp:int = 0):
+    def __init__(self, name:str, types:str, moves:str, EVs:dict, xp:int = 0,lvl:int = None):
         self.name = name
         self.types = types 
         self.moves = moves
@@ -17,10 +17,15 @@ class Pokemon:
         self.base_defense = EVs['DEFENSE']
         self.base_health = EVs['HEALTH']
 
-        self.lvl = 3*(1+np.mean([self.attack,self.defense]))
+        if lvl == None:
+            self.lvl = 5
+        else:
+            self.lvl = lvl
+
         self.xp = xp
         self.xp_req = (4*self.lvl**3)/5
-        if self.lvl > 5:
+
+        if self.lvl > 1:
             sim_lvl_up(self,1,self.lvl)
         else:
             self.attack = self.base_attack
@@ -117,22 +122,22 @@ def update_stats(self):
         self.attack += self.base_attack/50
         self.defense += self.base_defense/50
     
-    #make sure stats stay as a whole number
-    if (round(self.attack) > self.attack) :
-        self.attack = round(self.attack)
-    else:
-        att_overflow = self.attack - round(self.attack)
-        self.attack = round(self.attack)
-    if(round(self.defense) > self.defense):
-        self.defense = round(self.defense)
-    else:
-        def_overflow = self.defense - round(self.defense)
-        self.defense = round(self.defense)
-    if (round(self.health) > self.health):
-        self.health = round(self.health)
-    else: 
-        health_overflow = self.health - round(self.health)
-        self.health = round(self.health)
+        #make sure stats stay as a whole number
+        if (round(self.attack) > self.attack) :
+            self.attack = round(self.attack)
+        else:
+            att_overflow = self.attack - round(self.attack)
+            self.attack = round(self.attack)
+        if(round(self.defense) > self.defense):
+            self.defense = round(self.defense)
+        else:
+            def_overflow = self.defense - round(self.defense)
+            self.defense = round(self.defense)
+        if (round(self.health) > self.health):
+            self.health = round(self.health)
+        else: 
+            health_overflow = self.health - round(self.health)
+            self.health = round(self.health)
 
 
 def delay_print(s:str):
