@@ -38,6 +38,8 @@ class Pokemon:
 
         self.health_bar = HealthBar(self, color = "green")
 
+        self.type_adv:str = None
+
     
     def fight(self, target):
         #Causes two pokemon to fight each other
@@ -49,24 +51,24 @@ class Pokemon:
             if self.types == k:
                 #Both are the same type
                 if target.types == k:
-                    string_1_attack = 'It\'s not very effective...'
-                    string_2_attack = 'It\'s not very effective...'
+                    self.type_adv = None
+                    target.type_adv = None
+                    string_1_attack = None
+                    string_2_attack = None
                 
                 #target is strong
                 if target.types == version[(i+1)%3]:
-                    target.attack *= 2
-                    target.defense *= 2
-                    self.attack /= 2 
-                    self.defense /= 2
+                    target.type_adv = 'STRONG'
+                    self.type_adv = 'WEAK'
                     string_1_attack = 'It\'s not very effective...'
                     string_2_attack = 'It\'s super effective...'
 
                 #Target is weak
                 if target.types == version[(i+2)%3]:
-                    self.attack *= 2
-                    self.defense *= 2
-                    target.attack /= 2
-                    target.defense /= 2
+                    self.type_adv = 'STRONG'
+                    target.type_adv = 'WEAK'
+                    string_1_attack = 'It\'s super effective'
+                    string_2_attack = 'It\'s not very effective'
         #Create health bar
         target.health_bar = HealthBar(target, color = "red")
         #The actual fight
@@ -107,11 +109,19 @@ class Pokemon:
             if acc_roll < move_dict[self.moves[index-1]].accuracy:
                 #determine user damage
                 self.damage = round(((((2*self.lvl)/5)+2)*(move_dict[self.moves[index-1]].power*self.attack/target.defense)/50+2)*(random.randrange(217,255)/255))
+
+                if self.type_adv == 'STRONG' :
+                    self.damage *= 2
+                elif self.type_adv == 'WEAK':
+                    self.damage /= 2
+                    self.damage = int(self.damage)
+
                 target.health -= min(self.damage,target.health)
                 target.health_bar.update()
 
                 delay_print(f"{self.moves[index-1]} does {self.damage} damage to {target.name}\n")
-                delay_print(f"{string_1_attack}\n")
+                if(string_1_attack != None):
+                    delay_print(f"{string_1_attack}\n")
             else:
                 delay_print(f"{self.moves[index-1]} missed.\n")
 
@@ -130,16 +140,24 @@ class Pokemon:
             if acc_roll < move_dict[self.moves[index-1]].accuracy:
                 #determine target damage
                 target.damage = round((((((2*target.lvl)/5)+2)*(move_dict[target.moves[index-1]].power)*target.attack/self.defense)/50+2)*(random.randrange(217,255)/255))
+
+                if target.type_adv == 'STRONG' :
+                    target.damage *= 2
+                elif target.type_adv == 'WEAK':
+                    target.damage /= 2
+                    target.damage = int(target.damage)
+
                 self.health -= target.damage
                 self.health_bar.update()
 
                 delay_print(f"{target.name} uses {target.moves[index-1]} and it does {target.damage} damage to {self.name}\n")
-                delay_print(f"{string_2_attack}\n")
+                if (string_2_attack != None):
+                    delay_print(f"{string_2_attack}\n")
             else:
                 delay_print(f"{target.name} attempts to use {target.moves[index-1]} but it missed.\n")
 
             if self.health <= 0:
-                delay_print(f"{self.name} has fainted")
+                delay_print(f"Your {self.name} has fainted")
                 break
 
             time.sleep(1)
