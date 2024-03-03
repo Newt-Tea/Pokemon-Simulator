@@ -3,7 +3,9 @@ import time
 from health_bar import HealthBar
 import sys
 import random
-from move import Move
+from move import move_dict
+import os
+
 
 random.seed()
 
@@ -23,35 +25,23 @@ class Pokemon:
             self.lvl = lvl
 
         self.xp = xp
+        self.total_xp = 0
         self.xp_req = (4*self.lvl**3)/5
 
-        if self.lvl > 1:
-            sim_lvl_up(self,1,self.lvl)
-        else:
-            self.attack = self.base_attack
-            self.defense = self.base_defense
-            self.health = self.base_health
+        # if self.lvl > 1:
+        #     sim_lvl_up(self,1,self.lvl)
+        # else:
+        self.attack = self.base_attack
+        self.defense = self.base_defense
+        self.health = self.base_health
+        self.max_health = EVs['HEALTH']
+
+        self.health_bar = HealthBar(self, color = "green")
 
     
     def fight(self, target):
         #Causes two pokemon to fight each other
-        print('-----POKEMON BATTLE-----')
-        print(f"\n{self.name}")
-        print(f"TYPE/", self.types)
-        print("ATTACK/",self.attack)
-        print("DEFENSE/", self.defense)
-        #TODO change to a scaled system later
-        print("LVL",self.lvl)
-        print(f"XP {self.xp}/{self.xp_req}")
-        print("\nVS")
-
-        print(f"\n{target.name}")
-        print(f"TYPE/", target.types)
-        print("ATTACK/",target.attack)
-        print("DEFENSE/", target.defense)
-        #TODO change to a scaled system later
-        print("LVL",target.lvl)
-        time.sleep(2)
+        
 
         #type advantages
         version = ['Fire', 'Water', 'Grass']
@@ -78,22 +68,54 @@ class Pokemon:
                     target.attack /= 2
                     target.defense /= 2
         #Create health bar
-        self.HealthBar.draw()
-        target.HealthBar.draw()
+        target.health_bar = HealthBar(target, color = "red")
         #The actual fight
         while(self.health > 0) and (target.health > 0):
-            self.HealthBar.update()
-            target.HealthBar.update()
+            os.system('cls')
+            print('-----POKEMON BATTLE-----')
+            print(f"\n{self.name}")
+            print(f"TYPE/", self.types)
+            print("ATTACK/",self.attack)
+            print("DEFENSE/", self.defense)
+            #TODO change to a scaled system later
+            print("LVL",self.lvl)
+            print(f"XP {self.xp}/{self.xp_req}")
+            self.health_bar.draw()
+            print("\nVS")
 
-            print(f"Go {self.name}!")
+            print(f"\n{target.name}")
+            print(f"TYPE/", target.types)
+            print("ATTACK/",target.attack)
+            print("DEFENSE/", target.defense)
+            #TODO change to a scaled system later
+            print("LVL",target.lvl)
+            target.health_bar.draw()
+            time.sleep(2)
+            
+
+            
+
+            delay_print(f"Go {self.name}!\n")
             for i, x in enumerate(self.moves):
-                print(f"{i+1}.", x)
+                delay_print(f"{i+1}. {x}\n")
             index = int(input("Pick a move: "))
-            delay_print(f"{self.name} used {moves[index-1]}!")
+            delay_print(f"{self.name} used {self.moves[index-1]}!\n")
 
-            #determine user damage
-            self.damage = (((2*self.lvl)/5)+2)*(self.moves[index-1].power*self.attack/target.defense)*(random.randrange(217,255)/255)
-            target.health -= self.damage
+            #Rolls for accuracy
+            acc_roll = random.randrange(0,100)
+            #if roll is less then the accuracy of the move selected it hits
+            if acc_roll < move_dict[self.moves[index-1]].accuracy:
+                #determine user damage
+                self.damage = round(((((2*self.lvl)/5)+2)*(move_dict[self.moves[index-1]].power*self.attack/target.defense)/50+2)*(random.randrange(217,255)/255))
+                target.health -= min(self.damage,target.health)
+                target.health_bar.update()
+
+                delay_print(f"{self.moves[index-1]} does {self.damage} damage to {target.name}\n")
+                delay_print(f"{string_1_attack}\n")
+            else:
+                delay_print(f"{self.moves[index-1]} missed.\n")
+
+            
 
             time.sleep(1)
 
@@ -101,9 +123,24 @@ class Pokemon:
                 delay_print(f"{target.name} has fainted")
                 self.xp += target.lvl/7
                 break
-            #determine target damage
-            target.damage = ((((2*target.lvl)/5)+2)*(target.moves[index-1].power)*target.attack/self.defense)*(random.randrange(217,255)/255)
-            self.health -= target.damage
+
+            #Rolls for accuracy
+            acc_roll = random.randrange(0,100)
+            #if roll is less then the accuracy of the move selected it hits
+            if acc_roll < move_dict[self.moves[index-1]].accuracy:
+                #determine target damage
+                target.damage = round((((((2*target.lvl)/5)+2)*(move_dict[target.moves[index-1]].power)*target.attack/self.defense)/50+2)*(random.randrange(217,255)/255))
+                self.health -= target.damage
+                self.health_bar.update()
+
+                delay_print(f"{target.name} uses {target.moves[index-1]} and it does {target.damage} damage to {self.name}\n")
+                delay_print(f"{string_2_attack}\n")
+            else:
+                delay_print(f"{target.name} attempts to use {target.moves[index-1]} but it missed.\n")
+
+            if self.health <= 0:
+                delay_print(f"{self.name} has fainted")
+                break
 
             time.sleep(1)
         
@@ -113,10 +150,13 @@ class Pokemon:
 att_overflow:float = 0
 def_overflow:float = 0
 health_overflow:float = 0
+
+
+
 def update_stats(self):
     #check for level up
     if (self.xp >= self.xp_req):
-        total_xp += self.xp
+        self.total_xp += self.xp
         self.xp -= self.xp_req
         self.health += self.base_health/50
         self.attack += self.base_attack/50
@@ -150,5 +190,6 @@ def delay_print(s:str):
 def sim_lvl_up(self,curr_lvl,desired_lvl):
     #upgrades stats when a pokemon is initilized to ensure consitancy
     while curr_lvl < desired_lvl:
+        self.xp = self.xp_req
         update_stats(self)
-        curr_lvl -= 1
+        curr_lvl += 1

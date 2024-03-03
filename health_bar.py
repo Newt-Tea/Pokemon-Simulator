@@ -61,7 +61,7 @@ class HealthBar:
         self.length = length
         self.is_colored = is_colored
         self.color = self.colors.get(color) or self.colors["default"]
-        self.max_value = entity.maxHealth
+        self.max_value = entity.max_health
         self.current_value = entity.health
 
     def update(self) -> None:
@@ -76,7 +76,7 @@ class HealthBar:
         """
         remaining_bars = round(self.current_value / self.max_value * self.length)
         lost_bars = self.length - remaining_bars
-        print(f"{self.entity.name}'s Health: {self.entity.health}/{self.entity.maxHealth}")
+        print(f"Health: {self.entity.health}/{self.entity.max_health}")
         print(f"{self.barrier}"
               f"{self.color if self.is_colored else ''}"
               f"{remaining_bars * self.symbol_remaining}"
