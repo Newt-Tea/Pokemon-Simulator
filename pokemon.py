@@ -92,7 +92,7 @@ class Pokemon:
             #TODO change to a scaled system later
             print("LVL",target.lvl)
             target.health_bar.draw()
-            time.sleep(2)
+            time.sleep(1)
             
 
             
@@ -132,6 +132,7 @@ class Pokemon:
             if target.health <= 0:
                 delay_print(f"{target.name} has fainted")
                 self.xp += target.lvl/7
+                self.money = random.randrange(0,5000)
                 break
 
             #Rolls for accuracy
@@ -158,11 +159,12 @@ class Pokemon:
 
             if self.health <= 0:
                 delay_print(f"Your {self.name} has fainted")
+                self.money = 0
                 break
 
             time.sleep(1)
         
-        money = random.randrange(0,5000)
+
         
 
 att_overflow:float = 0
