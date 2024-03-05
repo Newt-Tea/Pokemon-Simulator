@@ -28,9 +28,7 @@ class Pokemon:
         self.total_xp = 0
         self.xp_req = (4*self.lvl**3)/5
 
-        # if self.lvl > 1:
-        #     sim_lvl_up(self,1,self.lvl)
-        # else:
+        
         self.attack = self.base_attack
         self.defense = self.base_defense
         self.health = self.base_health
