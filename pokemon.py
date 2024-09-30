@@ -236,7 +236,7 @@ def delay_print(s:str):
         time.sleep(0.05)
 
 def sim_lvl_up(self,curr_lvl,desired_lvl):
-    """upgrades stats when a pokemon is initilized to ensure consitancy"""
+    """upgrades stats when a pokemon is initilized to ensure consistancy"""
     while curr_lvl < desired_lvl:
         self.xp = self.xp_req
         update_stats(self)
