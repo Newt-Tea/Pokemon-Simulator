@@ -1,3 +1,4 @@
+"""This script generates a graphical health bar for a character"""
 import os
 
 os.system("")

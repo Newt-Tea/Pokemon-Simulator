@@ -3,18 +3,32 @@ import time
 from health_bar import HealthBar
 import sys
 import random
-from move import move_dict
 import os
 
-
 random.seed()
+
+class Move:
+    """A class to create moves"""
+    def __init__(self,power:int,accuracy:int,pp:int) -> None:
+        self.pp = pp
+        self.power = power
+        self.accuracy = accuracy
+
+move_dict = {
+    'Fire Blast' : Move(120,85,5),
+    'Earthquake' : Move(100,100,10),
+    'Body Slam' : Move(85,100,15),
+    'Slash' : Move(70,100,20),
+    'Surf' : Move(95,100,15),
+    'Blizzard' : Move(120,90,5)
+}
 
 class Pokemon:
     def __init__(self, name:str, types:str, moves:str, EVs:dict, xp:int = 0,lvl:int = None):
         self.name = name
         self.types = types 
         self.moves = moves
-
+        
         self.base_attack = EVs['ATTACK']
         self.base_defense = EVs['DEFENSE']
         self.base_health = EVs['HEALTH']
