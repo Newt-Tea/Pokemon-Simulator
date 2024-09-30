@@ -1,9 +1,15 @@
-import numpy as np
-import time
-from health_bar import HealthBar
+"""A module for creating pokemon as well as their moves
+Classes:
+Pokemon
+Moves
+
+"""
 import sys
 import random
 import os
+import time
+from health_bar import HealthBar
+
 
 random.seed()
 
@@ -24,16 +30,35 @@ move_dict = {
 }
 
 class Pokemon:
-    def __init__(self, name:str, types:str, moves:str, EVs:dict, xp:int = 0,lvl:int = None):
+    """
+    A Class for creating pokemon objects
+    ...
+    
+    Attributes
+    ----------
+    name:str
+        Name of the Pokemon
+    types:str
+        Battle types of the Pokemon
+    moves:str
+        Currently avaiable moves
+    ev:dict
+        Evolution Values
+    xp:int = 0
+        Experience towards the next level
+    lvl:int = None
+        The current level of the Pokemon
+    """
+    def __init__(self, name:str, types:str, moves:str, ev:dict, xp:int = 0,lvl:int = None):
         self.name = name
-        self.types = types 
+        self.types = types
         self.moves = moves
-        
-        self.base_attack = EVs['ATTACK']
-        self.base_defense = EVs['DEFENSE']
-        self.base_health = EVs['HEALTH']
 
-        if lvl == None:
+        self.base_attack = ev['ATTACK']
+        self.base_defense = ev['DEFENSE']
+        self.base_health = ev['HEALTH']
+
+        if lvl is None:
             self.lvl = 5
         else:
             self.lvl = lvl
@@ -42,22 +67,25 @@ class Pokemon:
         self.total_xp = 0
         self.xp_req = (4*self.lvl**3)/5
 
-        
         self.attack = self.base_attack
         self.defense = self.base_defense
         self.health = self.base_health
-        self.max_health = EVs['HEALTH']
+        self.max_health = ev['HEALTH']
+        self.damage = 0
 
         self.health_bar = HealthBar(self, color = "green")
 
         self.type_adv:str = None
+        self.money = 0
+        self.att_overflow:float = 0
+        self.def_overflow:float = 0
+        self.health_overflow:float = 0
 
-    
     def fight(self, target):
-        #Causes two pokemon to fight each other
-        
-
-        #type advantages
+        """Causes two pokemon to fight each other"""
+        string_1_attack = None
+        string_2_attack = None
+        #Type advantages
         version = ['Fire', 'Water', 'Grass']
         for i,k in enumerate(version):
             if self.types == k:
@@ -67,8 +95,8 @@ class Pokemon:
                     target.type_adv = None
                     string_1_attack = None
                     string_2_attack = None
-                
-                #target is strong
+
+                #Target is strong
                 if target.types == version[(i+1)%3]:
                     target.type_adv = 'STRONG'
                     self.type_adv = 'WEAK'
@@ -88,26 +116,21 @@ class Pokemon:
             os.system('cls')
             print('-----POKEMON BATTLE-----')
             print(f"\n{self.name}")
-            print(f"TYPE/", self.types)
+            print("TYPE/", self.types)
             print("ATTACK/",self.attack)
             print("DEFENSE/", self.defense)
-            #TODO change to a scaled system later
             print("LVL",self.lvl)
             print(f"XP {self.xp}/{self.xp_req}")
             self.health_bar.draw()
             print("\nVS")
 
             print(f"\n{target.name}")
-            print(f"TYPE/", target.types)
+            print("TYPE/", target.types)
             print("ATTACK/",target.attack)
             print("DEFENSE/", target.defense)
-            #TODO change to a scaled system later
             print("LVL",target.lvl)
             target.health_bar.draw()
             time.sleep(1)
-            
-
-            
 
             delay_print(f"Go {self.name}!\n")
             for i, x in enumerate(self.moves):
@@ -132,12 +155,10 @@ class Pokemon:
                 target.health_bar.update()
 
                 delay_print(f"{self.moves[index-1]} does {self.damage} damage to {target.name}\n")
-                if(string_1_attack != None):
+                if string_1_attack is not None:
                     delay_print(f"{string_1_attack}\n")
             else:
                 delay_print(f"{self.moves[index-1]} missed.\n")
-
-            
 
             time.sleep(1)
 
@@ -164,7 +185,7 @@ class Pokemon:
                 self.health_bar.update()
 
                 delay_print(f"{target.name} uses {target.moves[index-1]} and it does {target.damage} damage to {self.name}\n")
-                if (string_2_attack != None):
+                if string_2_attack is not None:
                     delay_print(f"{string_2_attack}\n")
             else:
                 delay_print(f"{target.name} attempts to use {target.moves[index-1]} but it missed.\n")
@@ -175,52 +196,47 @@ class Pokemon:
                 break
 
             time.sleep(1)
-        
-
-        
-
-att_overflow:float = 0
-def_overflow:float = 0
-health_overflow:float = 0
-
 
 
 def update_stats(self):
+    """Checks to see if pokemon can level up if so changes stats accordingly
+    """
+
     #check for level up
-    if (self.xp >= self.xp_req):
+    if self.xp >= self.xp_req:
         self.total_xp += self.xp
         self.xp -= self.xp_req
         self.health += self.base_health/50
         self.attack += self.base_attack/50
         self.defense += self.base_defense/50
-    
+
         #make sure stats stay as a whole number
-        if (round(self.attack) > self.attack) :
+        if round(self.attack)  > self.attack + self.att_overflow :
             self.attack = round(self.attack)
         else:
-            att_overflow = self.attack - round(self.attack)
+            self.att_overflow += self.attack - round(self.attack)
             self.attack = round(self.attack)
-        if(round(self.defense) > self.defense):
+        if round(self.defense) > self.defense + self.def_overflow:
             self.defense = round(self.defense)
         else:
-            def_overflow = self.defense - round(self.defense)
+            self.def_overflow += self.defense - round(self.defense)
             self.defense = round(self.defense)
-        if (round(self.health) > self.health):
+        if round(self.health) > self.health + self.health_overflow:
             self.health = round(self.health)
-        else: 
-            health_overflow = self.health - round(self.health)
+        else:
+            self.health_overflow += self.health - round(self.health)
             self.health = round(self.health)
 
 
 def delay_print(s:str):
-    #prints one char at a time to simulate gameboy
-    for c in s: 
+    """prints one char at a time to simulate gameboy"""
+    for c in s:
         sys.stdout.write(c)
         sys.stdout.flush()
         time.sleep(0.05)
 
 def sim_lvl_up(self,curr_lvl,desired_lvl):
-    #upgrades stats when a pokemon is initilized to ensure consitancy
+    """upgrades stats when a pokemon is initilized to ensure consitancy"""
     while curr_lvl < desired_lvl:
         self.xp = self.xp_req
         update_stats(self)

@@ -18,40 +18,40 @@ if __name__ == '__main__':
         "Blastoise" : Pokemon('Blastoise', 'Water', ['Surf', 'Earthquake', 'Blizzard', 'Slash'],{'ATTACK':83,'DEFENSE':100,'HEALTH':79},0)
     }
     char_list:list = []
-    idx:int = 0
-    again:bool = True
-    money:int = 0
+    IDX:int = 0
+    AGAIN:bool = True
+    MONEY:int = 0
 
     #game loop
-    while again:
-        valid:bool = False
+    while AGAIN:
+        VALID:bool = False
         delay_print("Choose your Pokemon\n-------------------\n")
 
         for key in char_dict:
-            delay_print(f"{idx+1}. {key}\n")
+            delay_print(f"{IDX+1}. {key}\n")
             char_list.append(key)
-            idx += 1
+            IDX += 1
         user_mon = char_dict[char_list[int(input("Choose your Pokemon: "))-1]]
         target = char_dict[char_list[int(input("Choose your opponent: "))-1]]
         user_mon.fight(target)
         restart = input("Would you like to fight again: (y/n): ")
 
-        while valid is False:
-            if restart == 'y' or restart == 'Y' or restart == 'yes' or restart == 'Yes':
-                again = True
-                valid = True
+        while VALID is False:
+            if restart in ('y','Y','yes','Yes'):
+                AGAIN = True
+                VALID = True
                 #reset value for next attempt
-                idx = 0
+                IDX = 0
                 char_list = []
-                money += user_mon.money
+                MONEY += user_mon.money
                 user_mon.health = user_mon.max_health
                 target.health = target.max_health
 
-            elif restart == 'n' or restart == 'N' or restart == 'No' or restart == 'no':
-                again = False
-                valid = True
-                print(f"You gained ${money} over the course of your adventures")
+            elif restart in ('n','N','y','Y'):
+                AGAIN = False
+                VALID = True
+                print(f"You gained ${MONEY} over the course of your adventures")
             else:
                 delay_print("Please enter a valid response")
-                valid = False
+                VALID = False
             
