@@ -5,10 +5,10 @@ from pokemon import Pokemon
 
 
 
-def delay_print(s:str):
+def delay_print(string:str):
     """A method to print one char at a time simulating a gameboy"""
-    for c in s:
-        sys.stdout.write(c)
+    for char in string:
+        sys.stdout.write(char)
         sys.stdout.flush()
         time.sleep(0.05)
 

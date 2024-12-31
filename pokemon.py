@@ -133,8 +133,8 @@ class Pokemon:
             time.sleep(1)
 
             delay_print(f"Go {self.name}!\n")
-            for i, x in enumerate(self.moves):
-                delay_print(f"{i+1}. {x}\n")
+            for move_num, move_name in enumerate(self.moves):
+                delay_print(f"{move_num+1}. {move_name}\n")
             index = int(input("Pick a move: "))
             delay_print(f"{self.name} used {self.moves[index-1]}!\n")
 
@@ -228,10 +228,10 @@ def update_stats(self):
             self.health = round(self.health)
 
 
-def delay_print(s:str):
+def delay_print(string:str):
     """prints one char at a time to simulate gameboy"""
-    for c in s:
-        sys.stdout.write(c)
+    for char in string:
+        sys.stdout.write(char)
         sys.stdout.flush()
         time.sleep(0.05)
 
